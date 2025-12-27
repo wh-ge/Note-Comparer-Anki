@@ -80,9 +80,9 @@ class QueueDialog(QDialog):
 
         #Resize the columns
         for groupIndex in range(self.Comparer.groupNum):
-            self.queueTable.horizontalHeader().setSectionResizeMode(0 + groupIndex*3, QHeaderView.Stretch)
-            self.queueTable.horizontalHeader().setSectionResizeMode(1 + groupIndex*3, QHeaderView.Fixed)
-            self.queueTable.horizontalHeader().setSectionResizeMode(2 + groupIndex*3, QHeaderView.Fixed)
+            self.queueTable.horizontalHeader().setSectionResizeMode(0 + groupIndex*3, QHeaderView.ResizeMode.Stretch)
+            self.queueTable.horizontalHeader().setSectionResizeMode(1 + groupIndex*3, QHeaderView.ResizeMode.Fixed)
+            self.queueTable.horizontalHeader().setSectionResizeMode(2 + groupIndex*3, QHeaderView.ResizeMode.Fixed)
             self.queueTable.horizontalHeader().resizeSection(1 + groupIndex*3, 105)
             self.queueTable.horizontalHeader().resizeSection(2 + groupIndex*3, 105)
 
