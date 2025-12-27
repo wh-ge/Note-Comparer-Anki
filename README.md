@@ -1,5 +1,5 @@
 # Note Comparer Anki
-An anki addon for 2.1 for comparing notes for duplicates.
+An anki addon for > 25.09 for comparing notes for duplicates.
 
 ## What to use Note Comparer for?
 ![Main window](/screenshots/main.jpg)
