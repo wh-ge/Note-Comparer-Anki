@@ -37,7 +37,7 @@ class Dialog(QDialog):
             \nBy default, notes in different groups are marked as duplicates when their fields with the same number matches.\
             \nYou can disable this and specificy your own conditions for duplicate notes if you enable \'advanced mode\' below.\
 			\nHover over \'advanced mode\' or \'RegEx capture\' for more explanation.')
-        self.intro.setAlignment(Qt.AlignCenter)
+        self.intro.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.intro)
 
         #Create Comparer object and then using the Comparer, create subwindows.
