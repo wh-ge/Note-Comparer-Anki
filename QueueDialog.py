@@ -208,15 +208,15 @@ class QueueDialog(QDialog):
     #Method to ask for conformation for performing the actions by creating a message box
     def askConfirmation(self):
         msg = QMessageBox()
-        msg.setIcon(QMessageBox.Question)
+        msg.setIcon(QMessageBox.Icon.Question)
         msg.setText("All actions have been set and are ready to be performed.")
         msg.setInformativeText("Are you sure you want to perform the set actions on the notes?")
         msg.setWindowTitle("Confirmation")
-        msg.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        msg.setStandardButtons(QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
         res = msg.exec()
 
         #When the user agrees, close the current window
         #and perform the actions
-        if res == QMessageBox.Ok:
+        if res == QMessageBox.StandardButton.Ok:
             self.accept()
             self.Comparer.performActions(self.maxRows)
