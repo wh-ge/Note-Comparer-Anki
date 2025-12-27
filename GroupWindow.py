@@ -38,7 +38,7 @@ class GroupWindowLayout(QVBoxLayout):
         #Create and add widgets to this layout group window
         self.groupNum = self.groupIndex + 1
         self.title = QLabel(f"<b>Group {self.groupNum} (G{self.groupNum})</b>", parent)
-        self.title.setAlignment(Qt.AlignCenter)
+        self.title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.addWidget(self.title)
 
         #Add widget to select group type and link trigger method
