@@ -40,9 +40,9 @@ class FieldTable(QTableWidget):
         self.addFieldRow()
 
         #Resize the columns
-        self.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
-        self.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
-        self.horizontalHeader().setSectionResizeMode(2, QHeaderView.Fixed)
+        self.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        self.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        self.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
         self.horizontalHeader().resizeSection(2, 65)
 
     #Method trigger to update the field in the Comparer object and also adds a new row if the index = row count - 1
