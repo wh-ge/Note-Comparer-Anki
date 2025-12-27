@@ -77,7 +77,7 @@ class GroupWindowLayout(QVBoxLayout):
         #Add widget with autocompleter to enter a tag for the duplicate action
         self.tagBox = QLineEdit(parent)
         completer = QCompleter(self.group.fieldInfo['Tags'].keys(), parent)
-        completer.setCaseSensitivity(Qt.CaseInsensitive)
+        completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
         self.tagBox.setCompleter(completer)
         self.tagBox.setPlaceholderText('Enter an existing tag or a new one.')
         self.addWidget(self.tagBox)
