@@ -12,7 +12,7 @@ from aqt import mw
 from aqt.utils import showInfo
 
 #Import all of the Qt GUI library
-from aqt.qt import *
+from aqt.qt import QComboBox, QDialog, QHeaderView, QLabel, QLineEdit, QMessageBox, QPushButton, QTableWidget, QTableWidgetItem, QVBoxLayout, Qt
 
 #Import local .py modules
 from . import Utils
@@ -40,7 +40,7 @@ class QueueDialog(QDialog):
             If you want to change the action for all duplicates in a group at once, close this window, select the appropiate action from the dropdown menu        
             and reopen this window by pressing 'show duplicates'. If you hover over a duplicate note you will be able to see all of its fields.
             Some notes are marked as duplicates multiple times and all of the set actions will therefore be performed upon it.''', self)
-        self.intro.setAlignment(Qt.AlignCenter)
+        self.intro.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.intro)
         
         #Add a table widget to display the queue
