@@ -9,6 +9,8 @@ echo = Utils.echo
 #Class to build a conditional tree to compare notes
 class Node:
 
+    _negation = False
+
     def __init__(self, string, depth = 0, removeBrackets = True):
         self.children = []
         if removeBrackets:
@@ -23,17 +25,30 @@ class Node:
         self.rightValue = None
         self.solveMethod = None
     
+    # using property decorator as getter function for negation
+    @property
+    def negation(self):
+        return Node._negation  
+
+    # a setter function for negation
+    @negation.setter
+    def negation(self, neg):
+        if neg:
+            Node._negation = False
+        else:
+            Node._negation = True
+        
     #Function to set a string
     def setString(self, string):
         try:
             self.string = Utils.removeBrackets(string.replace('\n', ' ').replace('\t', ' '))
         except re.error as e:
             raise e
-
+    
     #Recursive tree method to create children by chopping the condition string set to 'value' into parts
     #to base new children on
     def createChildren(self):
-        #echo(self.string + ':' + str(self.depth))
+        #echo(self.string + ': depth:' + str(self.depth))
 
         #Remove any current children
         self.children = []
@@ -58,13 +73,13 @@ class Node:
         #Then, split the top level array based on 'and'/'or' operators
         #and clean up any empty values
         #these are the values for the children
-        childValues = [cv for cv in re.split(r'( and )|( or )', string) if cv not in [None, '']]
+        childValues = [cv for cv in re.split(r'( and )|( or )|(not )', string) if cv not in [None, '']] 
 
         #If there are child values, rebuild every child value using the saved brackets,
         #create new children and also let them make their own
         if len(childValues) > 1:
+            i = 0
             for cv in childValues:
-
                 #Rebuild the child value using the saved brackets
                 while '$' in cv:
                     for match in re.finditer(r'\$(\d+)', cv):
@@ -72,6 +87,7 @@ class Node:
 
                 #Remove any excess brackets from the child value,
                 #create a new child, add it and activate it
+                #echo(string + ': depth:' + str(self.depth) + ' :cv:' + cv)
                 child = Node(cv, self.depth + 1)
                 self.children.append(child)
                 child.createChildren()
@@ -83,7 +99,7 @@ class Node:
         else:
 
             #When the end child node is an operator return
-            if string in ['and', 'or']:
+            if string in ['and', 'or', 'not']:
                 return
 
             #Split the current value into left operand, operator and right operand
@@ -91,7 +107,7 @@ class Node:
 
             #When the length isn't 3 raise an error
             if len(stringSplit) != 3:
-                raise re.error(f'"{string}" is not a valid condition.')
+                raise re.error(f'"{string}" is too short and not a valid condition. Childvalues: "{childValues}"')
 
             #Retrieve the types of the operands
             leftType, self.leftValue = self.__class__.operandType(stringSplit[0])
@@ -130,7 +146,7 @@ class Node:
                 
                 #The neither operands can be an regular expression
                 if leftType == 'regex' or rightType == 'regex':
-                    raise re.error(f"The neither the left or right part of \"{string}\" can be a regular expression.")
+                    raise re.error(f"Neither the left or right part of \"{string}\" can be a regular expression.")
 
                 #Save the solve method
                 self.solveMethod = self.insideCompare
@@ -170,7 +186,7 @@ class Node:
         if numChildren == 0:
 
             #When the value is an operator, return it
-            if self.string in ['and', 'or']:
+            if self.string in ['and', 'or', 'not']:
                 return self.string
 
             #When the value isn't an operator, solve and return the elemental condition
@@ -182,13 +198,28 @@ class Node:
         else:
             totalCondition = self.children[0].solve(notes)
             currentOperator = ''
-            for i in range(1, numChildren):
+            oldOperator = ''
+            i = 1
+            while i < numChildren:
+                condString = ''
+                '''
+                for j in range(1, numChildren):
+                    newCondition = self.children[j].solve(notes)
+                    condString = condString + 'j:' + str(j) + ':' + str(newCondition) + ':'
+                '''
                 newCondition = self.children[i].solve(notes)
-
                 #When a child is an operator save it temporarily
-                if newCondition in ['and', 'or']:
+                if newCondition in ['and', 'or', 'not']:
+                    #When the next child is a 'not' operator save it temporarily
+                    if newCondition == 'not': 
+                        #setter assignment via getter call
+                        self.negation = self.negation
+                    oldOperator = currentOperator
                     currentOperator = newCondition
                 
+                # (G1F1 = G2F1) and not ('sound:hello' in G1F2)
+                # (G1F1 = G2F1) and not ('sound' in G1F2) and ('sound' in G2F2)
+
                 #When it is a condition combine it with the total condition
                 #depending on the current operator, and delete the current operator afterwards.
                 #if there is no currentOperator, raise an error
@@ -197,9 +228,21 @@ class Node:
                         totalCondition = totalCondition and newCondition
                     elif currentOperator == 'or':
                         totalCondition = totalCondition or newCondition
+                    elif currentOperator == 'not':
+                        if isinstance(newCondition, bool):
+                            #setter assignment via getter call
+                            self.negation = self.negation
+                        if oldOperator == 'and':
+                            totalCondition = totalCondition and newCondition
+                        elif oldOperator == 'or':
+                            totalCondition = totalCondition or newCondition
+                        else:
+                            raise re.error(f'The use of the \'not\' operator is incorrect. i: "{str(i)}" cOp: "{currentOperator}" :newCond: "{newCondition}" :nc: "{str(numChildren)}" :string: "{self.string}" :total: "{totalCondition}"')
+                        oldOperator = ''
                     else:
-                        raise re.error('The use of \'and\'/\'or\' operators is incorrect.')
+                        raise re.error(f'The use of \'and\'/\'or\' operators is incorrect. i: "{str(i)}" cOp: "{currentOperator}" :newCond: "{newCondition}" :nc: "{str(numChildren)}" :string: "{self.string}" :total: "{totalCondition}"')
                     currentOperator = ''
+                i = i + 1
 
             #Return the total condition
             return totalCondition
@@ -246,7 +289,10 @@ class Node:
         if isinstance(left, bool) or isinstance(right, bool):
             return False
         else:
-            return left == right
+            if self.negation:
+                return not(left == right)
+            else:
+                return left == right
 
     def inCompare(self, notes):
 
@@ -258,7 +304,10 @@ class Node:
         if isinstance(left, bool) or isinstance(right, bool):
             return False
         else:
-            return left in right if ' ' in left else Utils.wordIn(left, right)
+            if self.negation:
+                return not(left in right if ' ' in left else Utils.wordIn(left, right))
+            else:
+                return left in right if ' ' in left else Utils.wordIn(left, right)
 
     def insideCompare(self, notes):
 
@@ -270,7 +319,12 @@ class Node:
         if isinstance(left, bool) or isinstance(right, bool):
             return False
         else:
-            return left in right
+            if self.negation:
+                #self.logger.debug(f'inside neg2: "{bNegation}"')            
+                return not(left in right) 
+            else:
+                #self.logger.debug(f'insComp: "{self.string}" :inside: "{left in right}"')
+                return left in right
 
     def equalRegexCompare(self, notes):
 
@@ -281,7 +335,10 @@ class Node:
         if isinstance(left, bool):
             return False
         else:
-            return re.fullmatch(self.rightValue, left) != None
+            if self.negation:
+                return not(re.fullmatch(self.rightValue, left) != None)
+            else:
+                return re.fullmatch(self.rightValue, left) != None
 
     def inRegexCompare(self, notes):
 
@@ -292,4 +349,7 @@ class Node:
         if isinstance(right, bool):
             return False
         else:
-            return re.search(self.leftValue, right) != None
+            if self.negation:
+                return not(re.search(self.leftValue, right) != None)
+            else:
+                return re.search(self.leftValue, right) != None
