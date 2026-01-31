@@ -91,6 +91,15 @@ class Dialog(QDialog):
                 <br><b>Example</b>: '<code>(G1F1 = G2F1 and G1F2 = G2F2) or (G1F3 = G2F3 and G1F4 = G2F4)</code>' means that either fields 1 and 2 must match OR fields 3 and 4
                 in order for all of these conditions together to be seen as '<code>True</code>' and the notes to be seen as duplicates.
             </li>
+            <li>With adding negation it is possible to compare original and new notes for missing or wrong values. The operator is:
+                <ul>
+                    <li>'<code>not</code>': This means that if the conditions at the right from '<code>not</code>' are '<code>True</code>' they will be set to '<code>False</code>' 
+                    and if the conditions at the right from '<code>not</code>' are '<code>False</code>' they will be set to '<code>True</code>'.</li>
+                </ul>                         
+                <div><b>Example 1</b>: '<code>(G1F1 = G2F1) and not (G1F2 = G2F2)</code>' means that the first field of both groups must match AND that field 2 of group 1 and group 2 does NOT match.
+                <div><b>Example 2</b>: '<code>(G1F1 = G2F1) and not ("" = G1F2) and ("" = G2F2)</code>' means that the first field of both groups must match
+                AND that field 2 of group 1 IS NOT empty, but field 2 of group 2 IS empty.
+            </li>
         </ul>''')
 
         self.regexCheckBox = QCheckBox('Enable RegEx capture for advanced mode', self)
@@ -249,7 +258,7 @@ class Dialog(QDialog):
         self.progressBar.setValue(percentage)
         self.progressActivityLabel.setText(activity)
         if timeLeft != None:
-            self.timeLeftLabel.setText(f'Time left: {str(datetime.timedelta(seconds=timeLeft))}\nDuplicates found: {len(self.Comparer.queue)}')
+            self.timeLeftLabel.setText(f'Time left: {str(datetime.timedelta(seconds=timeLeft))}\nHits found: {len(self.Comparer.queue)}')
 
     #Method to enable / disable all of the GUI elements
     def setEnabledAll(self, boolean):
