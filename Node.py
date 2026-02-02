@@ -202,11 +202,6 @@ class Node:
             i = 1
             while i < numChildren:
                 condString = ''
-                '''
-                for j in range(1, numChildren):
-                    newCondition = self.children[j].solve(notes)
-                    condString = condString + 'j:' + str(j) + ':' + str(newCondition) + ':'
-                '''
                 newCondition = self.children[i].solve(notes)
                 #When a child is an operator save it temporarily
                 if newCondition in ['and', 'or', 'not']:
